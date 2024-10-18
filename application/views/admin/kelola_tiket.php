@@ -110,47 +110,6 @@
   </div>
   <!-- /.modal -->
 
-	<!-- Modal reset password -->
-	<div class="modal fade" id="modal-resetPassword">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Reset Password</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body" class="detail_tiket">
-					<form method="post" id="formResetPassword">
-							<h4 style="text-align: center;">Form Reset Password</h4>
-							<div class="alert alert-danger" style="display: none;" id="errorMessage" role="alert"></div>
-							<div class="form-group <?=form_error('passwordlama') ? 'text-danger' : null ?>">
-									<input type="password" class="form-control col-md-15" placeholder="Masukkan password lama" required name="passwordlama" id="passwordlama" />
-									<?=form_error('password1', '<small class="text-danger">', '</small>'); ?>
-							</div>
-							<div class="form-group <?=form_error('password1') ? 'text-danger' : null ?>">
-									<input type="password" class="form-control col-md-15" minlength="8" placeholder="Masukkan password baru" required name="password1" id="password1" />
-									<?=form_error('password1', '<small class="text-danger">', '</small>'); ?>
-							</div>
-							<div class="form-group <?=form_error('password2') ? 'text-danger' : null ?>">
-									<input type="password" class="form-control col-md-15" minlength="8" placeholder="Ulangi password baru" required name="password2" id="password2" />
-									<?=form_error('password2', '<small class="text-danger">', '</small>'); ?>
-									<small id="errorKonfirmPass" class="text-danger"></small>
-							</div>
-							<div style="text-align: center;">
-									<button type="submit" id="buttonSubmitResetPassword" class="btn btn-primary" name="submit">Reset Password</button>
-							</div>
-					</form>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
-        </div>
-      </div>
-    </div>
-  </div>
-	<!-- /.modal -->
-
-
 </body>
 <footer>
   <script>
