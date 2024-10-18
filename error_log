@@ -1,0 +1,1 @@
+[20-Jan-2024 08:09:53 UTC] PHP Fatal error:  require(): Failed opening required '/home/ossplanter/public_html/support/application/views/vendor/composer/platform_check.php' (include_path='.:/opt/cpanel/ea-php74/root/usr/share/pear') in /home/ossplanter/public_html/support/application/views/vendor/composer/autoload_real.php on line 25
