@@ -111,9 +111,14 @@
           <?php } ?>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link" href="<?= base_url('auth/logout'); ?>">
-            <i class="fas fa-power-off"> Keluar</i>
-          </a>
+          <div style="display: flex; flex-direction: row; gap: 10px;">
+						<button class="btn  nav-link btn-link" data-toggle="modal" data-target="#modal-resetPassword">
+							<i class="fas fa-user-shield"> Reset Password</i>
+						</button>
+						<a class="nav-link" href="<?= base_url('auth/logout'); ?>">
+							<i class="fas fa-power-off"> Keluar</i>
+						</a>
+					</div>
           <!--div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
           <a href="<//?php echo base_url(); ?>Panel/profil" class="dropdown-item">
             <div class="media">

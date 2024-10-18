@@ -123,6 +123,18 @@
 			{'data': 'no_spk'},
 			{'data': 'prioritas'},
 			{
+				'data': 'upload_dokumen',
+				'render': function (data, type, row, meta) {
+					if (row.upload_dokumen != null && row.upload_dokumen != '') {
+						if (['jpg','jpeg','png','pdf','zip','rar'].includes(row.upload_dokumen.split('.').reverse()[0])) {
+							return `<td><a target="_blank" href="<?= base_url() ?>/assets/dokumen/${row.upload_dokumen}">${row.upload_dokumen}</a></td>`;
+						}
+					} 
+					
+					return '<td>Evidence tidak ada</td>';
+				}
+			},
+			{
 				'data': 'status',
 				'render': function(data, type, row) {
 					
@@ -584,4 +596,75 @@ async function getJamSelesai(hari) {
         throw error;
     }
 }
+</script>
+
+<script>
+	$(document).ready(function() {
+		$('#password1').on('input', function () {
+			$('#errorKonfirmPass').empty();
+			
+			var password1 = $(this).val();
+			var password2 = $('#password2').val();
+			if (password1 != password2 && password2 != '') {
+				$('#errorKonfirmPass').html('Password baru tidak sama dengan konfirmasi password!');
+
+				$('#buttonSubmitResetPassword').prop('disabled', true);
+			} else {
+				$('#buttonSubmitResetPassword').prop('disabled', false);
+			}
+		});
+
+		$('#password2').on('input', function () {
+			$('#errorKonfirmPass').empty();
+			
+			var password1 = $('#password1').val();
+			var password2 = $(this).val();
+			if (password1 != password2 && password1 != '') {
+				$('#errorKonfirmPass').html('Password baru tidak sama dengan konfirmasi password!');
+
+				$('#buttonSubmitResetPassword').prop('disabled', true);
+			} else {
+				$('#buttonSubmitResetPassword').prop('disabled', false);
+			}
+		});
+
+		$('#formResetPassword').on('submit', function (e) {
+			e.preventDefault();
+			
+			$('#buttonSubmitResetPassword').html(`<i class="fas fa-spin fa-spinner"></i> loading...`);
+			$('#buttonSubmitResetPassword').prop('disabled', true);
+
+			$('#errorMessage').empty();
+			$('#errorMessage').css('display', 'none');
+
+			data = $(this).serialize();
+
+			$.ajax({
+				type: 'POST',
+				url: '<?php echo base_url(); ?>panel/resetpass',
+				data: data,
+				success: function (response) {
+					$('#buttonSubmitResetPassword').html(`Reset Password`);
+					$('#buttonSubmitResetPassword').prop('disabled', false);
+
+					if (response.status == 'success') {
+						$('#modal-resetPassword').modal('hide');
+						
+						Swal.fire({
+							title:'Password Baru Tersimpan',
+							timer: 5000,
+							button: false
+						});
+					} else {
+						$('#errorMessage').html(response.message);
+						$('#errorMessage').css('display', 'block');
+					}
+				},
+				error: function (xhr, textStatus,  errorThrown) {
+					$('#buttonSubmitResetPassword').html(`Reset Password`);
+					$('#buttonSubmitResetPassword').prop('disabled', false);
+				}
+			});
+		});
+	});
 </script>

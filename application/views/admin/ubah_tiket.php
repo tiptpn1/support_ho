@@ -142,9 +142,13 @@
                   <div class="col-sm-10" align="left">
                     <select class="form-control col-md-10" name="prioritas" id="id_prioritas" required>
                       <option value="">Pilih prioritas</option>
-                      <option value="utama" <?php if ($kelola_tiket->prioritas == "utama") echo "selected" ?>>utama</option>
+                      <!-- <option value="utama" <?php if ($kelola_tiket->prioritas == "utama") echo "selected" ?>>utama</option>
                       <option value="sedang" <?php if ($kelola_tiket->prioritas == "sedang") echo "selected" ?>>sedang</option>
-                      <option value="rendah" <?php if ($kelola_tiket->prioritas == "rendah") echo "selected" ?>>rendah</option>
+                      <option value="rendah" <?php if ($kelola_tiket->prioritas == "rendah") echo "selected" ?>>rendah</option> -->
+                      <option value="high" <?php if ($kelola_tiket->prioritas == "high") echo "selected" ?>>High</option>
+                      <option value="medium" <?php if ($kelola_tiket->prioritas == "medium") echo "selected" ?>>Medium</option>
+                      <option value="low" <?php if ($kelola_tiket->prioritas == "low") echo "selected" ?>>Low</option>
+                      <option value="notApplicable" <?php if ($kelola_tiket->prioritas == "notApplicable") echo "selected" ?>>Not Applicable</option>
                     </select>
                   </div>
                 </div>

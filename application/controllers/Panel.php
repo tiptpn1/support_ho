@@ -998,7 +998,7 @@ class Panel extends CI_Controller
 		| Select As
 		*/
 		$this->datatables->table('ajukan_keluhan');
-		$this->datatables->select('id_ajukan,kode_servis,tanggal, nama, nama_master_kantor_baru, bagian,jns_kerusakan, uraian,no_spk,prioritas,status,waktu_antrian,waktu_ditangani,waktu_selesai,waktu_total');
+		$this->datatables->select('id_ajukan,kode_servis,tanggal, nama, nama_master_kantor_baru, bagian,jns_kerusakan, uraian,no_spk,prioritas,upload_dokumen,status,waktu_antrian,waktu_ditangani,waktu_selesai,waktu_total');
 
 		/*
 		| Join Clause
@@ -3039,5 +3039,61 @@ class Panel extends CI_Controller
 			$this->m_daftar_bagian->hapus_data_bagian($where);
 			redirect('Panel/daftar_bagian');
 		}
+	}
+
+	public function resetpass()
+	{
+		$old_password = $this->input->post('passwordlama');
+		$new_password = $this->input->post('password1');
+		$konfirmasi_password = $this->input->post('password2');
+
+		if ($old_password == null || $new_password == null || $konfirmasi_password == null) {
+			$this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+				'status' => 'failed',
+				'message' => 'Password lama tidak boleh kosong!'
+			]));
+		}
+
+		$get_user = $this->db->get_where('users', array('username' => $this->session->userdata('username')))->row();
+		
+		if (!$get_user) {
+			return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+				'status' => 'failed',
+				'message' => 'Password lama salah!'
+			]));
+		}
+
+		if ($get_user->password != md5($old_password)) {
+			return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+				'status' => 'failed',
+				'message' => 'Password lama salah!'
+			]));
+		}
+
+		if ($new_password != $konfirmasi_password) {
+			return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+				'status' => 'failed',
+				'message' => 'Password baru tidak sama dengan konfirmasi password!'
+			]));
+		}
+		
+		$this->db->set('password', md5($new_password));
+		$this->db->where('username', $get_user->username);
+		$this->db->update('users');
+
+		return $this->output
+		->set_content_type('application/json')
+		->set_output(json_encode([
+			'status' => 'success',
+			'message' => 'Password berhasil diperbarui'
+		]));
 	}
 }
