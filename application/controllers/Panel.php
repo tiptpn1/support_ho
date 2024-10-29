@@ -3056,6 +3056,15 @@ class Panel extends CI_Controller
 			]));
 		}
 
+		if (strlen($new_password) < 8) {
+			return $this->output
+			->set_content_type('application/json')
+			->set_output(json_encode([
+				'status' => 'failed',
+				'message' => 'Password baru setidaknya memiliki 8 karakter',
+			]));
+		}
+
 		$get_user = $this->db->get_where('users', array('username' => $this->session->userdata('username')))->row();
 		
 		if (!$get_user) {
