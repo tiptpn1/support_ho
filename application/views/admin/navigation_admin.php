@@ -279,6 +279,16 @@
                 </p>
               </a>
             </li>
+						<?php if ($this->session->userdata('role') == 1) { ?>
+							<li class="nav-item ">
+								<a href="<?php echo base_url(); ?>Panel/history_kelola_tiket" class="nav-link <?php if ($page == 'history_kelola_tiket') echo 'active' ?>">
+									<i class="nav-icon fas fa-history"></i>
+									<p>
+										History Pengelolaan Tiket
+									</p>
+								</a>
+							</li>
+						<?php } ?>
             <li class="nav-item ">
               <a href="<?php echo base_url(); ?>Panel/kelola_tiket_cybersecurity" class="nav-link <?php if ($page == 'kelola_tiket_cybersecurity') echo 'active' ?>">
                 <i class="nav-icon fas fa-laptop-code"></i>

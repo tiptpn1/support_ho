@@ -247,6 +247,164 @@
         }
 	});
 });
+  
+  $(document).ready(function(){
+  	var baseUrl = $('#base-url').data('url'); //Mengambil data value base_url dri elemen html
+	var table = $('#history-datatables-tiket');
+	table.DataTable({
+		'processing': true,
+		'serverSide': true,
+    "responsive": true,
+      "autoWidth": false,
+		'ordering': true,
+		'order': [[0, 'desc']],
+		'ajax': {
+			'url': table.data('url'),
+			'type': 'post'
+		},
+		'deferRender': true,
+		'aLengthMenu': [[10, 15, 50], [10, 15, 50]],
+		'columns': [
+      {
+            "render": function(data, type, row, meta) {
+              return meta.row + meta.settings._iDisplayStart + 1;
+            }
+      },
+			{'data': 'kode_servis'},
+			{'data': 'waktu'},
+			{'data': 'tanggal'},
+			{'data': 'nama'},
+			{'data': 'nama_master_kantor_baru'},
+			{'data': 'bagian'},
+			{'data': 'jns_kerusakan'},
+			{'data': 'uraian'},
+			{'data': 'no_spk'},
+			{'data': 'prioritas'},
+			{
+				'data': 'upload_dokumen',
+				'render': function (data, type, row, meta) {
+					if (row.upload_dokumen != null && row.upload_dokumen != '') {
+						if (['jpg','jpeg','png','pdf','zip','rar'].includes(row.upload_dokumen.split('.').reverse()[0])) {
+							return `<td><a target="_blank" href="<?= base_url() ?>/assets/dokumen/${row.upload_dokumen}">${row.upload_dokumen}</a></td>`;
+						}
+					} 
+					
+					return '<td>Evidence tidak ada</td>';
+				}
+			},
+			{
+				'data': 'status',
+				'render': function(data, type, row) {
+					
+					if (row.status == "") 
+					{
+						return '<td><span class="badge bg-danger">Menunggu</span></td>';
+					} 
+					else 
+					{
+						if(row.status === "Selesai")
+						{
+							return '<td><span class="badge bg-success">Selesai</span></td>';
+						}
+						else if(row.status == "Sedang ditangani")
+						{
+							return '<td><span class="badge bg-warning">Sedang Ditangani</span></td>';
+						}
+						else
+						{
+							return '<td><span class="badge bg-info">Antrian</span></td>';
+						}
+					}
+				}
+            },
+			{
+				'data': 'waktu_antrian',
+				'render': function(data, type, row) {
+					if (row.waktu_antrian!= null) 
+					{
+					    
+					    return 'Tunggu <br>' + row.waktu_antrian + '</br>';
+					
+					//console.log(jarak_waktu("2023-12-06 14:30:02", "2023-12-06 16:30:02"));
+					//Menampilkan isi tabel
+					//tabelAntrian(row.tanggal, row.waktu_antrian);
+					//console.log(row.tanggal);
+					//console.log(row.waktu_antrian);
+
+					}	
+					else{
+					    return 'Tunggu <br> 00:00:00 </br>';
+					}
+					
+				}
+            },
+			{
+				'data': 'waktu_ditangani',
+				'render': function(data, type, row) {
+					
+					if (row.waktu_ditangani != null) 
+					{
+					    return 'Antrian <br>' + row.waktu_ditangani + '</br>';
+						//return 'Antrian <br> (jarak_waktu(' + row.waktu_antrian + ', ' + row.waktu_ditangani + '))</br>';
+						//return '<td> Antrian <br> (<?php //echo jarak_waktu(' . row.waktu_antrian . ', ' . row.waktu_ditangani . '); ?>)</br>';
+					}	
+					else{
+					    return 'Antrian <br> 00:00:00 </br>';
+					}
+				}
+            },
+			{
+				'data': 'waktu_selesai',
+				'render': function(data, type, row) {
+					
+					if (row.waktu_selesai != null) 
+					{
+					    return 'Penanganan <br>' + row.waktu_selesai + '</br>';
+						//return 'Penanganan <br> (jarak_waktu(' + row.waktu_ditangani + ', ' + row.waktu_selesai + '))</br>';
+						//return '<td> Penanganan <br> (<?php //echo jarak_waktu(' . row.waktu_ditangani . ', ' . row.waktu_selesai . '); ?>)</br>';
+					}	
+					else{
+					    return 'Penanganan <br> 00:00:00 </br>';
+					}
+				}
+            },
+            {
+				'data': 'waktu_total',
+				'render': function(data, type, row) {
+					
+					if (row.waktu_selesai != null) 
+					{
+					    return 'Total <br>' + row.waktu_total + '</br>';
+						//return 'Penanganan <br> (jarak_waktu(' + row.waktu_ditangani + ', ' + row.waktu_selesai + '))</br>';
+						//return '<td> Penanganan <br> (<?php //echo jarak_waktu(' . row.waktu_ditangani . ', ' . row.waktu_selesai . '); ?>)</br>';
+					}				
+					else{
+					    return 'Total <br> 00:00:00 </br>';
+					}
+				}
+            },
+      		// {'render': function(data, type, row){ //Tampilkan kolom Action
+            //     if (row.status === "Sedang ditangani" || row.status === "Selesai") {
+            //         var html ='<a href="#" type="button" class="pilih-modal" data-toggle="modal" data-target="#PdfModal" role="button" data-id_ajukan="' + row.id_ajukan + '"><img src="' + baseUrl + 'assets/images/icon-print.png" alt="print" width="50" height="50"></a>';
+            //         html+= '<a id="detail" class="btn btn-info" data-toggle="modal" data-id_ajukan="'+row.id_ajukan+'" data-target="#modal-lg"><i class="fa fa-eye"></i></a>';
+            //         html+= '<a class="btn btn-warning" href="' + baseUrl + 'Panel/ubah_tiket/' + row.id_ajukan + '"><i class="fa fa-edit"></i></a>';
+			// 	    html+= '<a class="btn btn-danger" onclick="return confirm_delete()" href="' + baseUrl + 'Panel/hapus_tiket/' + row.id_ajukan + '"><i class="fa fa-trash"></i></a>';
+            //         return html;
+            //     }
+
+			// 	var html = '<a id="detail" class="btn btn-info" data-toggle="modal" data-id_ajukan="'+row.id_ajukan+'" data-target="#modal-lg"><i class="fa fa-eye"></i></a>';
+			// 	html+= '<a class="btn btn-warning" href="' + baseUrl + 'Panel/ubah_tiket/' + row.id_ajukan + '"><i class="fa fa-edit"></i></a>';
+			// 	html+= '<a class="btn btn-danger" onclick="return confirm_delete()" href="' + baseUrl + 'Panel/hapus_tiket/' + row.id_ajukan + '"><i class="fa fa-trash"></i></a>';
+			// 	return html;
+			// 	}
+			// }
+
+		],
+		'initComplete': function(settings, json) {
+            updateDataTable(settings);
+        }
+	});
+});
 
   $(document).ready(function(){
   	var baseUrl = $('#base-url').data('url'); //Mengambil data value base_url dri elemen html

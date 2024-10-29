@@ -1204,22 +1204,22 @@ class Panel extends CI_Controller
 
 		$kd_servis = $this->input->post('kd_servis');
 		$cek_kd = $this->m_histori->tampil_kd($kd_servis)->row();
-		if ($cek_kd == NULL) {
+		// if ($cek_kd == NULL) {
 			$this->m_kelola_tiket->edit_aksi_tiket($data, $where);
 			$data_asli = $this->db->get_where('ajukan_keluhan', array('id_ajukan' => $this->input->post('id_ajukan')))->row();
 			$this->db->insert('ajukan_keluhan_histori', $data_asli);
 			//$this->send();
-		} else {
-			$this->m_kelola_tiket->edit_aksi_tiket($data, $where);
-			$data_asli = $this->db->select('id_ajukan,kode_servis,nama, id_bagian,tanggal,email,jns_kerusakan,id_master_jns,id_perangkat,uraian,prioritas,status,pengguna_layanan,solusi,uraian_solusi,nama_ti,vendor,biaya,no_spk,upload_spk,disposisi,waktu_antrian,waktu_ditangani,waktu_selesai,lama_penanganan,tahun');
+		// } else {
+		// 	$this->m_kelola_tiket->edit_aksi_tiket($data, $where);
+		// 	$data_asli = $this->db->select('id_ajukan,kode_servis,nama, id_bagian,tanggal,email,jns_kerusakan,id_master_jns,id_perangkat,uraian,prioritas,status,pengguna_layanan,solusi,uraian_solusi,nama_ti,vendor,biaya,no_spk,upload_spk,disposisi,waktu_antrian,waktu_ditangani,waktu_selesai,lama_penanganan,tahun');
 			//$data_asli = $this->db->get_where('ajukan_keluhan_histori', array('kode_servis' => $this->input->post('kd_servis')))->row();
-			$data_asli = $this->db->get_where('ajukan_keluhan', array('id_ajukan' => $this->input->post('id_ajukan')))->row();
+			// $data_asli = $this->db->get_where('ajukan_keluhan', array('id_ajukan' => $this->input->post('id_ajukan')))->row();
 			//echo json_encode($data_asli);
 			//die();
-			$this->db->where('id_ajukan', $this->input->post('id_ajukan'));
-			$this->db->update('ajukan_keluhan_histori', $data_asli);
+			// $this->db->where('id_ajukan', $this->input->post('id_ajukan'));
+			// $this->db->update('ajukan_keluhan_histori', $data_asli);
 			//$this->send();
-		}
+		// }
 
 		//Data yang diedit barusan
 		//redirect('Panel/kelola_tiket');
@@ -3316,5 +3316,32 @@ class Panel extends CI_Controller
 		// }
 
 		return redirect('Panel/kelola_tiket_cybersecurity', 'refresh');
+	}
+
+	public function history_kelola_tiket()
+	{
+		$this->load->view('admin/history_kelola_tiket');
+	}
+
+	public function get_history_tiket()
+	{
+		$kantor = $this->session->userdata('id_master_kantor');
+		/*
+		| Select As
+		*/
+		$this->datatables->table('ajukan_keluhan_histori');
+		$this->datatables->select('id_keluhan_histori,waktu,id_ajukan,kode_servis,tanggal, nama, nama_master_kantor_baru, bagian,jns_kerusakan, uraian,no_spk,prioritas,upload_dokumen,status,waktu_antrian,waktu_ditangani,waktu_selesai,waktu_total');
+
+		/*
+		| Join Clause
+		| $this->datatables->join('table', 'condition', 'type')
+		| By default parameter type adalah null, anda bisa menambahkan INNER JOIN dll
+		*/
+		$this->datatables->join('bagian', 'ajukan_keluhan_histori.id_bagian = bagian.id_bagian', 'left');
+		$this->datatables->join('master_kantor', 'ajukan_keluhan_histori.id_master_kantor = master_kantor.id_master_kantor', 'left');
+		$this->datatables->where(['ajukan_keluhan_histori.id_master_kantor' => $kantor]);
+		$this->db->order_by('id_keluhan_histori', 'desc');
+		
+		echo $this->datatables->draw();
 	}
 }
