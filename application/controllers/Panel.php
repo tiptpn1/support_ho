@@ -3125,13 +3125,15 @@ class Panel extends CI_Controller
 
 	public function ubah_tiket_cybersecurity($id_ajukan)
 	{
-		$id_departemen = $this->session->userdata('id_master_kantor');
+		// $id_departemen = $this->session->userdata('id_master_kantor');
 		//Hapus link
 		$this->session->unset_userdata('link');
 		//
 		$data['kelola_tiket'] = $this->m_kelola_tiket_cybersecurity->edit_kelola_tiket($id_ajukan)->row();
 		// $data['perangkat'] = $this->m_perangkat->tampil_aktif_perangkat($id_departemen)->result();
-		$data['bagian'] = $this->m_kelola_tiket_cybersecurity->tampil_bagian($id_departemen)->result();
+		if ($data['kelola_tiket']->id_master_kantor != null) {
+			$data['bagian'] = $this->m_kelola_tiket_cybersecurity->tampil_bagian($data['kelola_tiket']->id_master_kantor)->result();
+		}
 
 		$this->load->view('admin/ubah_tiket_cybersecurity', $data);
 	}
