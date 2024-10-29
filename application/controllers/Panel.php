@@ -22,7 +22,7 @@ class Panel extends CI_Controller
 			redirect(base_url('user/index'));
 		}
 
-		$this->load->model(array('m_master_jns', 'm_master_prgkt', 'm_pengajuan', 'm_perangkat', 'm_kelola_tiket', 'm_master_layanan', 'm_list_role', 'm_daftar_pengguna', 'm_artikel', 'm_info', 'm_histori', 'm_jamkerja', 'm_hari_libur', 'm_tahun', 'M_master_layanan', 'm_user', 'm_master_group_perangkat', 'm_daftar_kantor', 'm_daftar_bagian'));
+		$this->load->model(array('m_master_jns', 'm_master_prgkt', 'm_pengajuan', 'm_perangkat', 'm_kelola_tiket', 'm_master_layanan', 'm_list_role', 'm_daftar_pengguna', 'm_artikel', 'm_info', 'm_histori', 'm_jamkerja', 'm_hari_libur', 'm_tahun', 'M_master_layanan', 'm_user', 'm_master_group_perangkat', 'm_daftar_kantor', 'm_daftar_bagian', 'm_kelola_tiket_cybersecurity'));
 	}
 
 
@@ -3095,5 +3095,215 @@ class Panel extends CI_Controller
 			'status' => 'success',
 			'message' => 'Password berhasil diperbarui'
 		]));
+	}
+
+	public function kelola_tiket_cybersecurity()
+	{
+		$this->load->view('admin/kelola_tiket_cybersecurity');
+	}
+
+	public function get_tiket_cybersecurity()
+	{
+		$kantor = $this->session->userdata('id_master_kantor');
+		/*
+		| Select As
+		*/
+		$this->datatables->table('ajukan_keluhan_keamanan_siber');
+		$this->datatables->select('id_ajukan,kode_servis,tanggal, nama, nama_master_kantor_baru, bagian,jns_kerusakan, uraian,no_spk,prioritas,upload_dokumen,status,waktu_antrian,waktu_ditangani,waktu_selesai,waktu_total');
+
+		/*
+		| Join Clause
+		| $this->datatables->join('table', 'condition', 'type')
+		| By default parameter type adalah null, anda bisa menambahkan INNER JOIN dll
+		*/
+		$this->datatables->join('bagian', 'ajukan_keluhan_keamanan_siber.id_bagian = bagian.id_bagian', 'left');
+		$this->datatables->join('master_kantor', 'ajukan_keluhan_keamanan_siber.id_master_kantor = master_kantor.id_master_kantor', 'left');
+		// $this->datatables->where(['ajukan_keluhan_keamanan_siber.id_master_kantor' => $kantor]);
+		
+		echo $this->datatables->draw();
+	}
+
+	public function ubah_tiket_cybersecurity($id_ajukan)
+	{
+		$id_departemen = $this->session->userdata('id_master_kantor');
+		//Hapus link
+		$this->session->unset_userdata('link');
+		//
+		$data['kelola_tiket'] = $this->m_kelola_tiket_cybersecurity->edit_kelola_tiket($id_ajukan)->row();
+		// $data['perangkat'] = $this->m_perangkat->tampil_aktif_perangkat($id_departemen)->result();
+		$data['bagian'] = $this->m_kelola_tiket_cybersecurity->tampil_bagian($id_departemen)->result();
+
+		$this->load->view('admin/ubah_tiket_cybersecurity', $data);
+	}
+
+	public function hapus_tiket_cybersecurity($id_ajukan)
+	{
+		$where = array('id_ajukan' => $id_ajukan);
+		$this->m_kelola_tiket_cybersecurity->hapus_data_tiket($where);
+
+		$this->session->set_flashdata('validDelete', 'bbb');
+
+		return redirect(base_url('Panel/kelola_tiket_cybersecurity'));
+	}
+
+	public function ubah_aksi_tiket_cybersecurity()
+	{
+		$data = array(
+			'id_ajukan' => $this->input->post('id_ajukan'),
+			'kode_servis'	=> $this->input->post('kd_servis'),
+			'nama' => $this->input->post('nama'),
+			'id_bagian' => $this->input->post('bagian'),
+			//'email' => $this->input->post('email'),
+			'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+			'id_master_jns' => $this->input->post('id_master_jns'),
+			'id_perangkat' => $this->input->post('id_pilprgkt'),
+			'uraian' => $this->input->post('uraian'),
+			'prioritas' => $this->input->post('prioritas'),
+			'status' => $this->input->post('status'),
+			'waktu_antrian' => $this->input->post('w_antrian'),
+			'waktu_ditangani' => $this->input->post('w_ditangani'),
+			'waktu_selesai' => $this->input->post('w_selesai'),
+			'pengguna_layanan' => $this->input->post('pengguna'),
+			'disposisi' => $this->input->post('disposisi'),
+			'konek_had_soft' => $this->input->post('konek_master_perangkat'),
+			'solusi' => $this->input->post('solusi'),
+			'uraian_solusi' => $this->input->post('uraian_solusi'),
+			'uraian_rca' => $this->input->post('uraian_rca'),
+			'nama_ti' => $this->input->post('nama_ti') ?? '',
+			'vendor' => $this->input->post('vendor') ?? '',
+			'no_spk' => $this->input->post('nospk') ?? '',
+			//'upload_spk' => $_FILES['upload_spk']['name'] ?? '',
+			//'upload_spk' => $this->input->post($data['upload_spk']) ?? '',
+			'status' => $this->input->post('status'),
+			//'biaya' => $this->input->post('biaya') ?? '',
+			'biaya' => (int) preg_replace("/[^0-9]/", "", $this->input->post('biaya')) ?? '',
+			//'biaya' => str_replace('.', '', substr($this->input->post('biaya'), 4)),
+		);
+		// if($this->input->post('konek_master_perangkat')  != NULL)
+		// {
+		// 	$data['konek_master_perangkat'] = $this->input->post('konek_master_perangkat');
+		// }
+
+
+		if (0) {
+			$config['upload_path']  = './assets/upload';
+			$config['allowed_types'] = 'jpg|png|pdf';
+			$config['max_size']     = '5000';
+			$this->load->library('upload',  $config);
+			if (!$this->upload->do_upload('upload_spk')) {
+				echo "upload gagal";
+				die();
+			} else {
+				$data['upload_spk'] = $this->upload->data('file_name');
+			}
+		} else {
+
+			if (isset($_FILES['upload_spk']) && $_FILES['upload_spk']['name'] != NULL) {
+
+				$config['upload_path']	= './assets/upload';
+				$config['allowed_types'] = 'jpg|jpeg|png|pdf';
+				$config['max_size']     = '5000';
+				///
+
+				$this->load->library('upload',  $config);
+				if (!$this->upload->do_upload('upload_spk')) {
+					echo "upload gagal";
+					echo $this->upload->display_errors();
+					die();
+				} else {
+
+					//upload_spk diubah
+					$data['upload_spk'] = $this->upload->data('file_name');
+					$id_ajukan = $this->input->post('id_ajukan');
+
+					$query = $this->db->get_where('ajukan_keluhan_keamanan_siber', array('id_ajukan' => $id_ajukan));
+					$ambil = $query->row()->upload_spk;
+					if ($ambil != NULL) unlink('./assets/upload/' . $ambil);
+					// print_r($ambil); die();
+					//echo $ambil;
+				}
+			} else {
+				$data['upload_spk'] = $this->input->post('lama');
+				//$data['upload_spk'] = $this->upload->data('file_name');
+			}
+		}
+		date_default_timezone_set("Asia/Jakarta");
+		$waktu_sekarang		= date('Y-m-d H:i:s');
+
+		if ($this->input->post('status') == "Antrian") {
+			$sts_skrng = $this->m_kelola_tiket_cybersecurity->edit_kelola_tiket($this->input->post('id_ajukan'))->row()->status;
+			$sts_baru  = $this->input->post('status');
+			if ($sts_skrng == $sts_baru) {
+			} else {
+				$data['waktu_antrian']		= $waktu_sekarang;
+				$data['waktu_ditangani']	= NULL;
+				$data['waktu_selesai']		= NULL;
+			}
+		} else if ($this->input->post('status') == "Sedang ditangani") {
+			$sts_skrng = $this->m_kelola_tiket_cybersecurity->edit_kelola_tiket($this->input->post('id_ajukan'))->row()->status;
+			$sts_baru  = $this->input->post('status');
+			if ($sts_skrng == $sts_baru) {
+			} else {
+				if ($data['waktu_antrian'] == NULL) {
+					$data['waktu_antrian']		= $waktu_sekarang;
+					$data['waktu_ditangani']	= $waktu_sekarang;
+					$data['waktu_selesai']	    = NULL;
+				} else {
+					$data['waktu_ditangani'] 		= $waktu_sekarang;
+					$data['waktu_selesai']			= NULL;
+				}
+			}
+		} else if ($this->input->post('status') == "Selesai") {
+			$sts_skrng = $this->m_kelola_tiket_cybersecurity->edit_kelola_tiket($this->input->post('id_ajukan'))->row()->status;
+			$sts_baru  = $this->input->post('status');
+			if ($sts_skrng == $sts_baru) {
+			} else {
+				if ($data['waktu_antrian'] == NULL && $data['waktu_ditangani'] == NULL && $data['waktu_selesai'] == NULL) {
+					$data['waktu_antrian']		= $waktu_sekarang;
+					$data['waktu_ditangani']	= $waktu_sekarang;
+					$data['waktu_selesai'] 		= $waktu_sekarang;
+				} else if ($data['waktu_ditangani'] == NULL && $data['waktu_selesai'] == NULL) {
+					$data['waktu_ditangani']	= $waktu_sekarang;
+					$data['waktu_selesai'] 		= $waktu_sekarang;
+				} else {
+					$data['waktu_selesai'] 		= $waktu_sekarang;
+				}
+			}
+		}
+		//
+		$where = array(
+			'id_ajukan' => $this->input->post('id_ajukan')
+		);
+		//histori lama
+		/*$data_asli = $this->db->get_where('ajukan_keluhan', array('id_ajukan' => $this->input->post('id_ajukan')))->row();
+
+		if ($data_asli->prioritas != '') {
+			//Histori
+			$data_h = $data;
+			$data_h['id_ajukan'] =  $this->input->post('id_ajukan');
+			$this->db->insert('ajukan_keluhan_histori', $data_h);
+		}*/
+		//
+
+		$kd_servis = $this->input->post('kd_servis');
+		// $cek_kd = $this->m_histori->tampil_kd($kd_servis)->row();
+		// if ($cek_kd == NULL) {
+		// 	$this->m_kelola_tiket->edit_aksi_tiket($data, $where);
+		// 	$data_asli = $this->db->get_where('ajukan_keluhan', array('id_ajukan' => $this->input->post('id_ajukan')))->row();
+		// 	$this->db->insert('ajukan_keluhan_histori', $data_asli);
+		// 	//$this->send();
+		// } else {
+			$this->m_kelola_tiket_cybersecurity->edit_aksi_tiket($data, $where);
+			// $data_asli = $this->db->select('id_ajukan,kode_servis,nama, id_bagian,tanggal,email,jns_kerusakan,id_master_jns,id_perangkat,uraian,prioritas,status,pengguna_layanan,solusi,uraian_solusi,nama_ti,vendor,biaya,no_spk,upload_spk,disposisi,waktu_antrian,waktu_ditangani,waktu_selesai,lama_penanganan,tahun');
+			// //$data_asli = $this->db->get_where('ajukan_keluhan_histori', array('kode_servis' => $this->input->post('kd_servis')))->row();
+			// $data_asli = $this->db->get_where('ajukan_keluhan', array('id_ajukan' => $this->input->post('id_ajukan')))->row();
+			// //echo json_encode($data_asli);
+			// //die();
+			// $this->db->where('id_ajukan', $this->input->post('id_ajukan'));
+			// $this->db->update('ajukan_keluhan_histori', $data_asli);
+			//$this->send();
+		// }
+
+		return redirect('Panel/kelola_tiket_cybersecurity', 'refresh');
 	}
 }

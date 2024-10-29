@@ -57,6 +57,28 @@ class M_user extends CI_Model
     $pusher->trigger('my-channel', 'my-event', $data);
   }
 
+	function input_data_ajukan_cybersecurity($data)
+  {
+    $this->db->insert('ajukan_keluhan_keamanan_siber', $data);
+
+    require FCPATH . 'vendor/autoload.php';
+
+    $options = array(
+      'cluster' => 'ap1',
+      'useTLS' => true
+    );
+    $pusher = new Pusher\Pusher(
+      'ad8644ee3904a2aa602c',
+      'e1c81b3d76ee382ff2e0',
+      '1016439',
+      $options
+    );
+
+    //$data['message'] = 'INFO : ada pengajuan tiket keluhan baru. Silahkan cek pengelolaan tiket';
+    $data[] = 'Notifikasi pengajuan tiket pengaduan cybersecurity baru. Silahkan cek pengelolaan tiket';
+    $pusher->trigger('my-channel', 'my-event', $data);
+  }
+
   function tampil_kelola_tiket()
   {
     $this->db->select('*');

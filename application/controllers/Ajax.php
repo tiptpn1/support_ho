@@ -255,4 +255,19 @@ class Ajax extends CI_Controller
             </div>
 		</form>';
 	}
+
+	public function print_formkeluhan_cybersecurity()
+	{
+		//$this->load->model('m_kelola_tiket_cybersecurity');
+		$this->load->model(array('m_kelola_tiket_cybersecurity'));
+		//$id_ajukan = "182";
+		$id_ajukan = $this->input->get('id_ajukan', TRUE);
+		$p['data'] = $this->m_kelola_tiket_cybersecurity->edit_kelola_tiket($id_ajukan)->row();
+		//print_r($this->db->last_query($p['data']));
+		$this->load->library('fungsi');
+		//echo '<pre>',print_r($p['perangkat']),'</pre>';
+		//die();
+		$html      = $this->load->view('admin/cetak_keluhan_cybersecurity', $p, true);
+		$this->fungsi->PdfGenerator($html, null, 'A4', 'potrait');
+	}
 }

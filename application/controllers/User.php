@@ -7,7 +7,7 @@ class User extends CI_Controller
 	function __construct()
 	{
 		parent::__construct();
-		$this->load->model(array('m_user', 'm_artikel', 'm_daftar_pengguna', 'm_info', 'm_kelola_tiket', 'm_master_layanan'));
+		$this->load->model(array('m_user', 'm_artikel', 'm_daftar_pengguna', 'm_info', 'm_kelola_tiket', 'm_master_layanan', 'm_kelola_tiket_cybersecurity'));
 		$this->load->helper('url');
 		$this->load->library('session');
 		$this->load->library('form_validation');
@@ -371,6 +371,106 @@ class User extends CI_Controller
 		//$data = array('img'=>$this->create_captcha(), 'navbar'=>'daftar_antrian');
 		$data['img'] = $this->create_captcha();
 		$this->load->view('template/sla', $data);
+	}
+
+	public function pengaduan_cybersecurity()
+	{
+		$data['img'] = $this->create_captcha();
+		$data['kantor']	= $this->m_user->tampil_kantor()->result();
+		$this->load->view('template/pengaduan_cybersecurity', $data);
+	}
+
+	public function set_old_data_pengaduan_cyber_security($next_id, $waktu_sekarang)
+	{
+		$this->session->set_flashdata('kode_servis', $next_id);
+		$this->session->set_flashdata('nama', $this->input->post('nama'));
+		$this->session->set_flashdata('id_bagian', $this->input->post('bagian'));
+		$this->session->set_flashdata('id_master_kantor', $this->input->post('kantor'));
+		$this->session->set_flashdata('tanggal', $waktu_sekarang);
+		$this->session->set_flashdata('hp', $this->input->post('hp'));
+		$this->session->set_flashdata('jns_kerusakan', $this->input->post('jns_kerusakan'));
+		$this->session->set_flashdata('id_master_jenis', $this->input->post('id_master_jenis'));
+		$this->session->set_flashdata('uraian', $this->input->post('uraian_kerusakan'));
+	}
+
+	public function  tambah_pengajuan_cybersecurity()
+	{
+		// set time zone
+		date_default_timezone_set('Asia/Jakarta');
+
+		// get waktu sekarang
+		$waktu_sekarang = date('Y-m-d H:i:s');
+		$tahun = date('Y');
+		
+		// tiket
+		$data['max_number'] = $this->m_kelola_tiket_cybersecurity->max_number()->result();
+		if (isset($data['max_number']) != NULL) {
+			$next_id = $data['max_number'][0]->nomor_servis + 1;
+			//$format=$no.'/'.$next_id.'/'.$date_split[0];
+		} else {
+			$next_id = '1';
+			//$format=$no.'/'.$date_split[1].'/'.$date_split[0];
+		}
+
+		// cek captcha
+		if  ($this->input->post('captcha') != $this->session->userdata('captchaword')) {
+			
+			
+			$this->session->set_flashdata('error', 'aaa');
+			$this->set_old_data_pengaduan_cyber_security($next_id, $waktu_sekarang);
+			return redirect('user/pengaduan_cybersecurity');
+		}
+
+		// upload file
+		$config['upload_path']          = './assets/dokumen_cybersecurity';
+		$config['allowed_types']        = 'jpg|jpeg|png|pdf|zip|rar';
+		$new_name = time() . $_FILES["upload_file"]['name'];
+		$config['file_name'] = $new_name;
+
+		$this->load->library('upload', $config);
+
+		if (isset($_POST['is_anonymous'])) {
+			$data = [
+				'kode_servis' => $next_id,
+				'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
+				// 'nama' => $this->input->post('nama'),
+				// 'id_bagian' => $this->input->post('bagian'),
+				// 'id_master_kantor' => $this->input->post('kantor'),
+				'tanggal' => $waktu_sekarang,
+				//'email' => $this->input->post('email'),
+				'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+				'id_master_jns' => $this->input->post('id_master_jns'),
+				'uraian' => $this->input->post('uraian_kerusakan'),
+				'tahun' => $tahun,
+				'is_anonymous' => 1,
+				// 'nomor_hp' => $this->input->post('hp'),
+			];
+		} else {
+			$data = [
+				'kode_servis' => $next_id,
+				'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
+				'nama' => $this->input->post('nama'),
+				'id_bagian' => $this->input->post('bagian'),
+				'id_master_kantor' => $this->input->post('kantor'),
+				'tanggal' => $waktu_sekarang,
+				//'email' => $this->input->post('email'),
+				'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+				'id_master_jns' => $this->input->post('id_master_jns'),
+				'uraian' => $this->input->post('uraian_kerusakan'),
+				'tahun' => $tahun,
+				'nomor_hp' => $this->input->post('hp'),
+				'is_anonymous' => 0,
+			];
+		}
+
+		// cek apakah submit anonym atau tidak
+		if ($this->upload->do_upload('upload_file')) {
+			$data['upload_dokumen'] = $this->upload->data('file_name');
+		}
+
+		$this->m_user->input_data_ajukan_cybersecurity($data);
+		$this->session->set_flashdata('valid', 'bbb');
+		return redirect('user/pengaduan_cybersecurity');
 	}
 
 	public function artikel($id)
