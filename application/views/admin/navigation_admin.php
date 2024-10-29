@@ -279,6 +279,14 @@
                 </p>
               </a>
             </li>
+            <li class="nav-item ">
+              <a href="<?php echo base_url(); ?>Panel/kelola_tiket_cybersecurity" class="nav-link <?php if ($page == 'kelola_tiket_cybersecurity') echo 'active' ?>">
+                <i class="nav-icon fas fa-laptop-code"></i>
+                <p>
+                  Pengelolaan Tiket Cybersecurity
+                </p>
+              </a>
+            </li>
             <li class="nav-item has-treeview <?php if ($page == 'laporan_grafik' || $page == 'laporan_tabel') echo 'menu-open' ?>">
               <a href="#" class="nav-link <?php if ($page == 'laporan_grafik' || $page == 'laporan_tabel') echo 'active' ?>">
                 <i class="nav-icon fas fa-chart-pie"></i>

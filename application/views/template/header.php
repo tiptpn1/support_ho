@@ -110,6 +110,7 @@
 					<li class="nav-item <?php if ($navbar == 'daftar_antrian') echo 'active' ?>"><a href="<?php echo base_url(); ?>User/daftar_antrian" class="nav-link">Daftar Antrian</a></li>
 					<li class="nav-item <?php if ($navbar == 'faq') echo 'active' ?>"><a href="<?php echo base_url(); ?>User/faq" class="nav-link">FAQ</a></li>
 					<li class="nav-item <?php if ($navbar == 'sla') echo 'active' ?>"><a href="<?php echo base_url(); ?>User/sla" class="nav-link">SLA</a></li>
+					<li class="nav-item <?php if ($navbar == 'pengaduan_cybersecurity') echo 'active' ?>"><a href="<?php echo base_url(); ?>User/pengaduan_cybersecurity" class="nav-link">Pengaduan Cybersecurity</a></li>
 					<li class="nav-item" data-toggle="modal" data-target="#mylogin"><a href="#" class="nav-link"><span class="glyphicon glyphicon-log-in"></span>Masuk</a></li>
 				</ul>
 			</div>
