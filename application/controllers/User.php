@@ -111,134 +111,163 @@ class User extends CI_Controller
 		}
 	}
 
+	public function set_old_value_ajukan_keluhan()
+	{
+		$this->session->set_flashdata('nama', $this->input->post('nama'));
+		$this->session->set_flashdata('id_bagian', $this->input->post('bagian'));
+		$this->session->set_flashdata('id_master_kantor', $this->input->post('kantor'));
+		$this->session->set_flashdata('hp', $this->input->post('hp'));
+		$this->session->set_flashdata('jns_kerusakan', $this->input->post('jns_kerusakan'));
+		$this->session->set_flashdata('id_master_jns', $this->input->post('id_master_jns'));
+		$this->session->set_flashdata('uraian', $this->input->post('uraian_kerusakan'));
+	}
+
 	public function tambah_aksi_ajukan()
 	{
-		$data['bagian']	= $this->m_user->tampil_bagian()->result();
-		//Waktu sekarang
-		date_default_timezone_set("Asia/Jakarta");
-		$waktu_sekarang		= date('Y-m-d H:i:s');
+		try {
+			// validation character
+			$regex = '/^[a-zA-Z0-9.,]*$/';
+			if (!preg_match($regex, $this->input->post('nama')) || !preg_match($regex, $this->input->post('hp')) || !preg_match($regex, $this->input->post('uraian_kerusakan'))) {
+				throw new Exception('errorChar');
+			}
 
-		//echo date("d-m-Y", strtotime($waktu_sekarang));
-		//
-		//$next_id = $this->db->query('SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = "k3new" AND TABLE_NAME = "ajukan_keluhan"')->row()->AUTO_INCREMENT;
-		$data['max_number'] = $this->m_kelola_tiket->max_number()->result();
-		//print_r ($data['max_number']);
+			$data['bagian']	= $this->m_user->tampil_bagian()->result();
+			//Waktu sekarang
+			date_default_timezone_set("Asia/Jakarta");
+			$waktu_sekarang		= date('Y-m-d H:i:s');
 
-		if (isset($data['max_number']) != NULL) {
-			$next_id = $data['max_number'][0]->nomor_servis + 1;
-			//$format=$no.'/'.$next_id.'/'.$date_split[0];
-		} else {
-			$next_id = '1';
-			//$format=$no.'/'.$date_split[1].'/'.$date_split[0];
-		}
-		$bagian = $this->input->post('bagian');
-		$kantor = $this->input->post('kantor');
-		$tahun = date('Y');
+			//echo date("d-m-Y", strtotime($waktu_sekarang));
+			//
+			//$next_id = $this->db->query('SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = "k3new" AND TABLE_NAME = "ajukan_keluhan"')->row()->AUTO_INCREMENT;
+			$data['max_number'] = $this->m_kelola_tiket->max_number()->result();
+			//print_r ($data['max_number']);
 
-		$config['upload_path']          = './assets/dokumen';
-		$config['allowed_types']        = 'jpg|jpeg|png|pdf|zip|rar';
-		$new_name = time() . $_FILES["upload_file"]['name'];
-		$config['file_name'] = $new_name;
-
-		$this->load->library('upload', $config);
-
-		if ($this->upload->do_upload('upload_file')) {
-			$data = [
-				'kode_servis' => $next_id,
-				'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
-				'nama' => $this->input->post('nama'),
-				'id_bagian' => $bagian,
-				'id_master_kantor' => $kantor,
-				'tanggal' => $waktu_sekarang,
-				//'email' => $this->input->post('email'),
-				'jns_kerusakan' => $this->input->post('jns_kerusakan'),
-				'id_master_jns' => $this->input->post('id_master_jns'),
-				'uraian' => $this->input->post('uraian_kerusakan'),
-				'tahun' => $tahun,
-				'nomor_hp' => $this->input->post('hp'),
-				'upload_dokumen' => $this->upload->data('file_name')
-			];
-			if ($this->input->post('captcha') == $this->session->userdata('captchaword')) {
-				//print_r($data); die();	
-				$this->m_user->input_data_ajukan($data, 'ajukan_keluhan');
-				//$this->send();
-				//$this->session->set_flashdata('success', "Data berhasil disimpan. Silahkan mengecek kotak masuk/sapam email anda untuk mendapatkan update keluhan.");
-				$this->session->set_flashdata('valid', 'bbb');
-				redirect(base_url('daftar_antrian'));
-				//header('Location: 'user/daftar_antrian);
-				//$this->session->set_flashdata('success', "Data berhasil disimpan");
-				//redirect("", 'refresh');
-				//return TRUE;
+			if (isset($data['max_number']) != NULL) {
+				$next_id = $data['max_number'][0]->nomor_servis + 1;
+				//$format=$no.'/'.$next_id.'/'.$date_split[0];
 			} else {
+				$next_id = '1';
+				//$format=$no.'/'.$date_split[1].'/'.$date_split[0];
+			}
+			$bagian = $this->input->post('bagian');
+			$kantor = $this->input->post('kantor');
+			$tahun = date('Y');
+
+			$config['upload_path']          = './assets/dokumen';
+			$config['allowed_types']        = 'jpg|jpeg|png|pdf|zip|rar';
+			$new_name = time() . $_FILES["upload_file"]['name'];
+			$config['file_name'] = $new_name;
+
+			$this->load->library('upload', $config);
+
+			if ($this->upload->do_upload('upload_file')) {
 				$data = [
 					'kode_servis' => $next_id,
+					'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
 					'nama' => $this->input->post('nama'),
-					'id_bagian' => $this->input->post('bagian'),
-					'id_master_kantor' => $this->input->post('kantor'),
+					'id_bagian' => $bagian,
+					'id_master_kantor' => $kantor,
 					'tanggal' => $waktu_sekarang,
-					'hp' => $this->input->post('hp'),
 					//'email' => $this->input->post('email'),
 					'jns_kerusakan' => $this->input->post('jns_kerusakan'),
 					'id_master_jns' => $this->input->post('id_master_jns'),
 					'uraian' => $this->input->post('uraian_kerusakan'),
-					// 'notif' => '<p style="color:red;"><b>Captcha salah, mohon masukkan kembali data yang benar. </b></p>'
+					'tahun' => $tahun,
+					'nomor_hp' => $this->input->post('hp'),
+					'upload_dokumen' => $this->upload->data('file_name')
 				];
-				$this->session->set_flashdata('error', 'aaa');
-				$this->session->set_flashdata($data);
-				//echo "<script>alert('Captcha salah!')</script>";
-				// return redirect()->back()->withInput();
-				redirect('user/index', $data);
-			}
-		} else {
-			$data = [
-				'kode_servis' => $next_id,
-				'format_nomor' => 'DPTI' . '/' . $next_id . '/' . $tahun,
-				'nama' => $this->input->post('nama'),
-				'id_bagian' => $bagian,
-				'id_master_kantor' => $kantor,
-				'tanggal' => $waktu_sekarang,
-				//'email' => $this->input->post('email'),
-				'jns_kerusakan' => $this->input->post('jns_kerusakan'),
-				'id_master_jns' => $this->input->post('id_master_jns'),
-				'uraian' => $this->input->post('uraian_kerusakan'),
-				'tahun' => $tahun,
-				'nomor_hp' => $this->input->post('hp'),
-				'upload_dokumen' => $this->upload->data('file_name')
-			];
-			if ($this->input->post('captcha') == $this->session->userdata('captchaword')) {
-				//print_r($data); die();	
-				$this->m_user->input_data_ajukan($data, 'ajukan_keluhan');
-				//$this->send();
-				//$this->session->set_flashdata('success', "Data berhasil disimpan. Silahkan mengecek kotak masuk/sapam email anda untuk mendapatkan update keluhan.");
-				$this->session->set_flashdata('valid', 'bbb');
-				redirect(base_url('daftar_antrian'));
-				//header('Location: 'user/daftar_antrian);
-				//$this->session->set_flashdata('success', "Data berhasil disimpan");
-				//redirect("", 'refresh');
-				//return TRUE;
+				if ($this->input->post('captcha') == $this->session->userdata('captchaword')) {
+					//print_r($data); die();	
+					$this->m_user->input_data_ajukan($data, 'ajukan_keluhan');
+					//$this->send();
+					//$this->session->set_flashdata('success', "Data berhasil disimpan. Silahkan mengecek kotak masuk/sapam email anda untuk mendapatkan update keluhan.");
+					$this->session->set_flashdata('valid', 'bbb');
+					redirect(base_url('daftar_antrian'));
+					//header('Location: 'user/daftar_antrian);
+					//$this->session->set_flashdata('success', "Data berhasil disimpan");
+					//redirect("", 'refresh');
+					//return TRUE;
+				} else {
+					$data = [
+						'kode_servis' => $next_id,
+						'nama' => $this->input->post('nama'),
+						'id_bagian' => $this->input->post('bagian'),
+						'id_master_kantor' => $this->input->post('kantor'),
+						'tanggal' => $waktu_sekarang,
+						'hp' => $this->input->post('hp'),
+						//'email' => $this->input->post('email'),
+						'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+						'id_master_jns' => $this->input->post('id_master_jns'),
+						'uraian' => $this->input->post('uraian_kerusakan'),
+						// 'notif' => '<p style="color:red;"><b>Captcha salah, mohon masukkan kembali data yang benar. </b></p>'
+					];
+					$this->session->set_flashdata('error', 'aaa');
+					$this->session->set_flashdata($data);
+					//echo "<script>alert('Captcha salah!')</script>";
+					// return redirect()->back()->withInput();
+					redirect('user/index', $data);
+				}
 			} else {
+				if ($_FILES['upload_file']['name'] != '') {
+					throw new Exception('errorFile');
+				}
+
 				$data = [
 					'kode_servis' => $next_id,
+					'format_nomor' => 'DPTI' . '/' . $next_id . '/' . $tahun,
 					'nama' => $this->input->post('nama'),
-					'id_bagian' => $this->input->post('bagian'),
-					'id_master_kantor' => $this->input->post('kantor'),
+					'id_bagian' => $bagian,
+					'id_master_kantor' => $kantor,
 					'tanggal' => $waktu_sekarang,
 					//'email' => $this->input->post('email'),
-					'hp' => $this->input->post('hp'),
 					'jns_kerusakan' => $this->input->post('jns_kerusakan'),
 					'id_master_jns' => $this->input->post('id_master_jns'),
 					'uraian' => $this->input->post('uraian_kerusakan'),
-					// 'notif' => 'Captcha salah, mohon masukkan kembali data yang benar.'
+					'tahun' => $tahun,
+					'nomor_hp' => $this->input->post('hp'),
+					'upload_dokumen' => $this->upload->data('file_name')
 				];
-				$this->session->set_flashdata('error', 'aaa');
-				$this->session->set_flashdata($data);
-				// $this->session->set_flashdata('selected_kantor', $this->input->post('kantor'));
-            	// $this->session->set_flashdata('selected_bagian', $this->input->post('bagian'));
-            	// $this->session->set_flashdata('selected_jns_kerusakan', $this->input->post('jns_kerusakan'));
-
-				//echo "<script>alert('Captcha salah!')</script>";
-				redirect('user/index');
+				if ($this->input->post('captcha') == $this->session->userdata('captchaword')) {
+					//print_r($data); die();	
+					$this->m_user->input_data_ajukan($data, 'ajukan_keluhan');
+					//$this->send();
+					//$this->session->set_flashdata('success', "Data berhasil disimpan. Silahkan mengecek kotak masuk/sapam email anda untuk mendapatkan update keluhan.");
+					$this->session->set_flashdata('valid', 'bbb');
+					redirect(base_url('daftar_antrian'));
+					//header('Location: 'user/daftar_antrian);
+					//$this->session->set_flashdata('success', "Data berhasil disimpan");
+					//redirect("", 'refresh');
+					//return TRUE;
+				} else {
+					$data = [
+						'kode_servis' => $next_id,
+						'nama' => $this->input->post('nama'),
+						'id_bagian' => $this->input->post('bagian'),
+						'id_master_kantor' => $this->input->post('kantor'),
+						'tanggal' => $waktu_sekarang,
+						//'email' => $this->input->post('email'),
+						'hp' => $this->input->post('hp'),
+						'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+						'id_master_jns' => $this->input->post('id_master_jns'),
+						'uraian' => $this->input->post('uraian_kerusakan'),
+						// 'notif' => 'Captcha salah, mohon masukkan kembali data yang benar.'
+					];
+					$this->session->set_flashdata('error', 'aaa');
+					$this->session->set_flashdata($data);
+					// $this->session->set_flashdata('selected_kantor', $this->input->post('kantor'));
+					// $this->session->set_flashdata('selected_bagian', $this->input->post('bagian'));
+					// $this->session->set_flashdata('selected_jns_kerusakan', $this->input->post('jns_kerusakan'));
+	
+					//echo "<script>alert('Captcha salah!')</script>";
+					redirect('user/index');
+				}
 			}
+		} catch (\Exception $e) {
+			$this->set_old_value_ajukan_keluhan();
+
+			$this->session->set_flashdata($e->getMessage(), 'Error');
+
+			return redirect('user/index');
 		}
 	}
 
@@ -395,82 +424,100 @@ class User extends CI_Controller
 
 	public function  tambah_pengajuan_cybersecurity()
 	{
-		// set time zone
-		date_default_timezone_set('Asia/Jakarta');
-
-		// get waktu sekarang
-		$waktu_sekarang = date('Y-m-d H:i:s');
-		$tahun = date('Y');
-		
-		// tiket
-		$data['max_number'] = $this->m_kelola_tiket_cybersecurity->max_number()->result();
-		if (isset($data['max_number']) != NULL) {
-			$next_id = $data['max_number'][0]->nomor_servis + 1;
-			//$format=$no.'/'.$next_id.'/'.$date_split[0];
-		} else {
-			$next_id = '1';
-			//$format=$no.'/'.$date_split[1].'/'.$date_split[0];
-		}
-
-		// cek captcha
-		if  ($this->input->post('captcha') != $this->session->userdata('captchaword')) {
+		try {
+			// validation character
+			$regex = '/^[a-zA-Z0-9.,]*$/';
+			if (!preg_match($regex, $this->input->post('nama')) || !preg_match($regex, $this->input->post('hp')) || !preg_match($regex, $this->input->post('uraian_kerusakan'))) {
+				throw new Exception('errorChar');
+			}
 			
+			// set time zone
+			date_default_timezone_set('Asia/Jakarta');
+
+			// get waktu sekarang
+			$waktu_sekarang = date('Y-m-d H:i:s');
+			$tahun = date('Y');
 			
-			$this->session->set_flashdata('error', 'aaa');
-			$this->set_old_data_pengaduan_cyber_security($next_id, $waktu_sekarang);
+			// tiket
+			$data['max_number'] = $this->m_kelola_tiket_cybersecurity->max_number()->result();
+			if (isset($data['max_number']) != NULL) {
+				$next_id = $data['max_number'][0]->nomor_servis + 1;
+				//$format=$no.'/'.$next_id.'/'.$date_split[0];
+			} else {
+				$next_id = '1';
+				//$format=$no.'/'.$date_split[1].'/'.$date_split[0];
+			}
+
+			// cek captcha
+			if  ($this->input->post('captcha') != $this->session->userdata('captchaword')) {
+				
+				
+				$this->session->set_flashdata('error', 'aaa');
+				$this->set_old_data_pengaduan_cyber_security($next_id, $waktu_sekarang);
+				return redirect('user/pengaduan_cybersecurity');
+			}
+
+			// upload file
+			$config['upload_path']          = './assets/dokumen_cybersecurity';
+			$config['allowed_types']        = 'jpg|jpeg|png|pdf|zip|rar';
+			$new_name = time() . $_FILES["upload_file"]['name'];
+			$config['file_name'] = $new_name;
+
+			$this->load->library('upload', $config);
+
+			if (isset($_POST['is_anonymous'])) {
+				$data = [
+					'kode_servis' => $next_id,
+					'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
+					// 'nama' => $this->input->post('nama'),
+					// 'id_bagian' => $this->input->post('bagian'),
+					// 'id_master_kantor' => $this->input->post('kantor'),
+					'tanggal' => $waktu_sekarang,
+					//'email' => $this->input->post('email'),
+					'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+					'id_master_jns' => $this->input->post('id_master_jns'),
+					'uraian' => $this->input->post('uraian_kerusakan'),
+					'tahun' => $tahun,
+					'is_anonymous' => 1,
+					// 'nomor_hp' => $this->input->post('hp'),
+				];
+			} else {
+				$data = [
+					'kode_servis' => $next_id,
+					'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
+					'nama' => $this->input->post('nama'),
+					'id_bagian' => $this->input->post('bagian'),
+					'id_master_kantor' => $this->input->post('kantor'),
+					'tanggal' => $waktu_sekarang,
+					//'email' => $this->input->post('email'),
+					'jns_kerusakan' => $this->input->post('jns_kerusakan'),
+					'id_master_jns' => $this->input->post('id_master_jns'),
+					'uraian' => $this->input->post('uraian_kerusakan'),
+					'tahun' => $tahun,
+					'nomor_hp' => $this->input->post('hp'),
+					'is_anonymous' => 0,
+				];
+			}
+
+			// cek apakah submit anonym atau tidak
+			if ($this->upload->do_upload('upload_file')) {
+				$data['upload_dokumen'] = $this->upload->data('file_name');
+			} else {
+				if ($_FILES['upload_file']['name'] != '') {
+					throw new Exception('errorFile');
+				}
+			}
+
+			$this->m_user->input_data_ajukan_cybersecurity($data);
+			$this->session->set_flashdata('valid', 'bbb');
+			return redirect('user/pengaduan_cybersecurity');
+		} catch (\Exception $e) {
+			$this->set_old_data_pengaduan_cyber_security('', '');
+
+			$this->session->set_flashdata($e->getMessage(), 'Error');
+
 			return redirect('user/pengaduan_cybersecurity');
 		}
-
-		// upload file
-		$config['upload_path']          = './assets/dokumen_cybersecurity';
-		$config['allowed_types']        = 'jpg|jpeg|png|pdf|zip|rar';
-		$new_name = time() . $_FILES["upload_file"]['name'];
-		$config['file_name'] = $new_name;
-
-		$this->load->library('upload', $config);
-
-		if (isset($_POST['is_anonymous'])) {
-			$data = [
-				'kode_servis' => $next_id,
-				'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
-				// 'nama' => $this->input->post('nama'),
-				// 'id_bagian' => $this->input->post('bagian'),
-				// 'id_master_kantor' => $this->input->post('kantor'),
-				'tanggal' => $waktu_sekarang,
-				//'email' => $this->input->post('email'),
-				'jns_kerusakan' => $this->input->post('jns_kerusakan'),
-				'id_master_jns' => $this->input->post('id_master_jns'),
-				'uraian' => $this->input->post('uraian_kerusakan'),
-				'tahun' => $tahun,
-				'is_anonymous' => 1,
-				// 'nomor_hp' => $this->input->post('hp'),
-			];
-		} else {
-			$data = [
-				'kode_servis' => $next_id,
-				'format_nomor' => '32' . '/' . $next_id . '/' . $tahun,
-				'nama' => $this->input->post('nama'),
-				'id_bagian' => $this->input->post('bagian'),
-				'id_master_kantor' => $this->input->post('kantor'),
-				'tanggal' => $waktu_sekarang,
-				//'email' => $this->input->post('email'),
-				'jns_kerusakan' => $this->input->post('jns_kerusakan'),
-				'id_master_jns' => $this->input->post('id_master_jns'),
-				'uraian' => $this->input->post('uraian_kerusakan'),
-				'tahun' => $tahun,
-				'nomor_hp' => $this->input->post('hp'),
-				'is_anonymous' => 0,
-			];
-		}
-
-		// cek apakah submit anonym atau tidak
-		if ($this->upload->do_upload('upload_file')) {
-			$data['upload_dokumen'] = $this->upload->data('file_name');
-		}
-
-		$this->m_user->input_data_ajukan_cybersecurity($data);
-		$this->session->set_flashdata('valid', 'bbb');
-		return redirect('user/pengaduan_cybersecurity');
 	}
 
 	public function artikel($id)

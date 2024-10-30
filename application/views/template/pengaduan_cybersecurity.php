@@ -193,7 +193,7 @@
 										</div>
 
 										<div class="form-group">
-											<input type="submit" name="submit" value="Ajukan" class="btn btn-secondary py-3 px-4">
+											<input type="submit" name="submit" id="buttonSubmitKeluhan" value="Ajukan" class="btn btn-secondary py-3 px-4">
 										</div>
 										<p style="color:yellow;">*Dengan mengisi email yang valid, Anda akan mendapat notifikasi progress penanganan keluhan Anda melalui email. Apabila tidak ada di Inbox, silakan periksa folder Spam</p>
 									</form>
@@ -250,6 +250,41 @@
 	</section>
 </body>
 <footer>
+<script>
+		const regex = /^[a-zA-Z0-9.,]*$/;
+		function checkValueIsNotValid() {
+			result = idInput.filter((item) => {
+				value = $(`#${item}`).val();
+				return !regex.test(value);
+			});
+
+			return result.length > 0;
+		}
+		
+		$(document).ready(function() {
+			idInput = ['nama', 'noHp', 'uraian_kerusakan'];
+			idInput.map((id) => {
+				$(`#${id}`).on('input', function () {
+					// handling submit button
+					if (checkValueIsNotValid()) {
+						$('#buttonSubmitKeluhan').prop('disabled', true);
+					} else {
+						$('#buttonSubmitKeluhan').prop('disabled', false);
+					}
+
+					// handling msg
+					val = $(this).val();
+					if (!regex.test(val)) {
+						$(`#error-${id}`).remove();
+						$(this).closest('div.form-group').append(`<div id="error-${id}" class="text-danger"><small><em>Tidak boleh ada karakter selain huruf, angka, tanda titik (.), dan tanda koma (,)</em></small></div>`)
+					} else {
+						$(`#error-${id}`).remove();
+					}
+				});
+			});
+		});
+		
+	</script>
 	<script type="text/javascript">
 		function f_kantor() {
 			var dropDown = document.getElementById("bagian");
@@ -378,6 +413,20 @@
 			});
 		</script>
 	<?php } ?>
+
+	<?php if ($this->session->flashdata('errorFile') || $this->session->flashdata('errorChar')) { 
+			$message = $this->session->flashdata('errorFile')? 'Pastikan bahwa file yang diupload berupa jpg,jpeg,png,pdf,zip, atau rar.' : ($this->session->flashdata('errorChar')? 'Pastikan inputan nama, nomor handphone, dan uraian masalah tidak ada simbol selain titik (.) dan (,)' : '');
+			?>
+    <script type="text/javascript">
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Ajukan Keluhan",
+        text: '<?= $message ?>',
+        timer: 5000,
+        button: false
+      });
+    </script>
+  <?php }  ?>
 
 	<?php $this->load->view("template/footer.php") ?>
 
