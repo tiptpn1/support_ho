@@ -265,7 +265,11 @@ class User extends CI_Controller
 		} catch (\Exception $e) {
 			$this->set_old_value_ajukan_keluhan();
 
-			$this->session->set_flashdata($e->getMessage(), 'Error');
+			if (in_array($e->getMessage(), ['errorFile', 'errorChar'])) {
+				$this->session->set_flashdata($e->getMessage(), 'Error');
+			} else {
+				$this->session->set_flashdata('serverError', 'bb');
+			}
 
 			return redirect('user/index');
 		}
@@ -513,8 +517,11 @@ class User extends CI_Controller
 			return redirect('user/pengaduan_cybersecurity');
 		} catch (\Exception $e) {
 			$this->set_old_data_pengaduan_cyber_security('', '');
-
-			$this->session->set_flashdata($e->getMessage(), 'Error');
+			if (in_array($e->getMessage(), ['errorFile', 'errorChar'])) {
+				$this->session->set_flashdata($e->getMessage(), 'Error');
+			} else {
+				$this->session->set_flashdata('serverError', 'bb');
+			}
 
 			return redirect('user/pengaduan_cybersecurity');
 		}

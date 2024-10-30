@@ -171,7 +171,7 @@
               </div>
               <div class="form-group">
                 <label style="margin: 0; top: 50%;  -ms-transform: translateY(-50%);  transform: translateY(-50%);  color:white">Upload File<br><small style="color:brown;">*jpg/jpeg/png/pdf</small></label>
-                <input type="file" class="form-control col-md-10" id="file" name="upload_file" accept=".jpg, .jpeg, .png, .pdf/*">
+                <input type="file" class="form-control col-md-10" id="file" name="upload_file" accept=".jpg, .jpeg, .png, .pdf">
               </div>
               <?php
               if ($this->session->flashdata('notif')) {
@@ -501,8 +501,19 @@
       });
     </script>
   <?php }  ?>
+	<?php if ($this->session->flashdata('serverError')) { ?>
+		<script type="text/javascript">
+			Swal.fire({
+				icon: "error",
+				title: "Server Error",
+				text: 'Server sedang mengalami error, silakan coba beberapa saat lagi.',
+				timer: 5000,
+				button: false
+			});
+		</script>
+	<?php }  ?>
      <?php if ($this->session->flashdata('errorFile') || $this->session->flashdata('errorChar')) { 
-			$message = $this->session->flashdata('errorFile')? 'Pastikan bahwa file yang diupload berupa jpg,jpeg,png,pdf,zip, atau rar.' : ($this->session->flashdata('errorChar')? 'Pastikan inputan nama, nomor handphone, dan uraian masalah tidak ada simbol selain titik (.) dan (,)' : '');
+			$message = $this->session->flashdata('errorFile')? 'Format file tidak sesuai.' : ($this->session->flashdata('errorChar')? 'Pastikan inputan nama, nomor handphone, dan uraian masalah tidak ada simbol selain titik (.) dan (,)' : '');
 			?>
     <script type="text/javascript">
       Swal.fire({

@@ -402,6 +402,18 @@
 			});
 		</script>
 	<?php }  ?>
+	
+	<?php if ($this->session->flashdata('serverError')) { ?>
+		<script type="text/javascript">
+			Swal.fire({
+				icon: "error",
+				title: "Server Error",
+				text: 'Server sedang mengalami error, silakan coba beberapa saat lagi.',
+				timer: 5000,
+				button: false
+			});
+		</script>
+	<?php }  ?>
 
 	<?php
 	if ($this->session->flashdata('valid')) { ?>
@@ -415,7 +427,7 @@
 	<?php } ?>
 
 	<?php if ($this->session->flashdata('errorFile') || $this->session->flashdata('errorChar')) { 
-			$message = $this->session->flashdata('errorFile')? 'Pastikan bahwa file yang diupload berupa jpg,jpeg,png,pdf,zip, atau rar.' : ($this->session->flashdata('errorChar')? 'Pastikan inputan nama, nomor handphone, dan uraian masalah tidak ada simbol selain titik (.) dan (,)' : '');
+			$message = $this->session->flashdata('errorFile')? 'Format file tidak sesuai.' : ($this->session->flashdata('errorChar')? 'Pastikan inputan nama, nomor handphone, dan uraian masalah tidak ada simbol selain titik (.) dan (,)' : '');
 			?>
     <script type="text/javascript">
       Swal.fire({
