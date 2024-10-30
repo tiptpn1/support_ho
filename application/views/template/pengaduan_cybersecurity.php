@@ -356,8 +356,6 @@
 		});
 	</script>
 
-	<?php $this->load->view("template/footer.php") ?>
-
 	<?php if ($this->session->flashdata('error')) { ?>
 		<script type="text/javascript">
 			Swal.fire({
