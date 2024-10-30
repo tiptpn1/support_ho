@@ -178,7 +178,9 @@ class User extends CI_Controller
 				];
 				if ($this->input->post('captcha') == $this->session->userdata('captchaword')) {
 					//print_r($data); die();	
+					$this->db->trans_begin();
 					$this->m_user->input_data_ajukan($data, 'ajukan_keluhan');
+					$this->db->trans_commit();
 					//$this->send();
 					//$this->session->set_flashdata('success', "Data berhasil disimpan. Silahkan mengecek kotak masuk/sapam email anda untuk mendapatkan update keluhan.");
 					$this->session->set_flashdata('valid', 'bbb');
@@ -229,7 +231,9 @@ class User extends CI_Controller
 				];
 				if ($this->input->post('captcha') == $this->session->userdata('captchaword')) {
 					//print_r($data); die();	
+					$this->db->trans_begin();
 					$this->m_user->input_data_ajukan($data, 'ajukan_keluhan');
+					$this->db->trans_commit();
 					//$this->send();
 					//$this->session->set_flashdata('success', "Data berhasil disimpan. Silahkan mengecek kotak masuk/sapam email anda untuk mendapatkan update keluhan.");
 					$this->session->set_flashdata('valid', 'bbb');
@@ -263,6 +267,7 @@ class User extends CI_Controller
 				}
 			}
 		} catch (\Exception $e) {
+			$this->db->trans_rollback();
 			$this->set_old_value_ajukan_keluhan();
 
 			if (in_array($e->getMessage(), ['errorFile', 'errorChar'])) {
@@ -511,11 +516,16 @@ class User extends CI_Controller
 					throw new Exception('errorFile');
 				}
 			}
+			$this->db->trans_begin();
 
 			$this->m_user->input_data_ajukan_cybersecurity($data);
 			$this->session->set_flashdata('valid', 'bbb');
+
+			$this->db->trans_commit();
+
 			return redirect('user/pengaduan_cybersecurity');
 		} catch (\Exception $e) {
+			$this->db->trans_rollback();
 			$this->set_old_data_pengaduan_cyber_security('', '');
 			if (in_array($e->getMessage(), ['errorFile', 'errorChar'])) {
 				$this->session->set_flashdata($e->getMessage(), 'Error');
