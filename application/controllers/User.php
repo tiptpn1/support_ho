@@ -126,7 +126,7 @@ class User extends CI_Controller
 	{
 		try {
 			// validation character
-			$regex = '/^[a-zA-Z0-9.,]*$/';
+			$regex = '/^[a-zA-Z0-9.,\s]*$/';
 			if (!preg_match($regex, $this->input->post('nama')) || !preg_match($regex, $this->input->post('hp')) || !preg_match($regex, $this->input->post('uraian_kerusakan'))) {
 				throw new Exception('errorChar');
 			}
@@ -435,7 +435,7 @@ class User extends CI_Controller
 	{
 		try {
 			// validation character
-			$regex = '/^[a-zA-Z0-9.,]*$/';
+			$regex = '/^[a-zA-Z0-9.,\s]*$/';
 			if (!preg_match($regex, $this->input->post('nama')) || !preg_match($regex, $this->input->post('hp')) || !preg_match($regex, $this->input->post('uraian_kerusakan'))) {
 				throw new Exception('errorChar');
 			}

@@ -251,7 +251,7 @@
 </body>
 <footer>
 <script>
-		const regex = /^[a-zA-Z0-9.,]*$/;
+		const regex = /^[a-zA-Z0-9.,\s]*$/;
 		function checkValueIsNotValid() {
 			result = idInput.filter((item) => {
 				value = $(`#${item}`).val();
